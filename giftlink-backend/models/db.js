@@ -1,4 +1,3 @@
-// db.js
 require('dotenv').config();
 const MongoClient = require('mongodb').MongoClient;
 
@@ -9,20 +8,26 @@ let dbInstance = null;
 const dbName = "giftdb";
 
 async function connectToDatabase() {
-    if (dbInstance){
-        return dbInstance
-    };
+    if (dbInstance) {
+        return dbInstance; // Return the cached database instance if already connected
+    }
 
-    const client = new MongoClient(url);      
+    try {
+        const client = new MongoClient(url, { useNewUrlParser: true, useUnifiedTopology: true });
 
-    // Task 1: Connect to MongoDB
-    // {{insert code}}
+        // Task 1: Connect to MongoDB
+        await client.connect();
+        console.log("Successfully connected to MongoDB");
 
-    // Task 2: Connect to database giftDB and store in variable dbInstance
-    //{{insert code}}
+        // Task 2: Connect to database giftDB and store in variable dbInstance
+        dbInstance = client.db(dbName);
 
-    // Task 3: Return database instance
-    // {{insert code}}
+        // Task 3: Return database instance
+        return dbInstance;
+    } catch (err) {
+        console.error("Failed to connect to MongoDB", err);
+        throw err;
+    }
 }
 
 module.exports = connectToDatabase;
