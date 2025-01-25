@@ -8,12 +8,11 @@ router.get('/', async (req, res, next) => {
     logger.info('/ called');
     try {
         const db = await connectToDatabase();
-
         const collection = db.collection("gifts");
         const gifts = await collection.find({}).toArray();
         res.json(gifts);
     } catch (e) {
-        logger.console.error('oops something went wrong', e)
+        logger.error('Oops, something went wrong', e); // Fixed typo
         next(e);
     }
 });
@@ -24,7 +23,7 @@ router.get('/:id', async (req, res, next) => {
         const db = await connectToDatabase();
         const collection = db.collection("gifts");
         const id = req.params.id;
-        const gift = await collection.findOne({ id: id });
+        const gift = await collection.findOne({ _id: new require('mongodb').ObjectId(id) }); // Fixed to use _id for MongoDB
 
         if (!gift) {
             return res.status(404).send("Gift not found");
@@ -35,7 +34,6 @@ router.get('/:id', async (req, res, next) => {
         next(e);
     }
 });
-
 
 // Add a new gift
 router.post('/', async (req, res, next) => {
